@@ -422,6 +422,19 @@ namespace DeltaDNA{
                         actionEvent.AddParam("imActionValue", eventArgs.ActionValue);
                     }
 
+                    //BRD: Added the armoury common properties
+                    #if !DELTA_DNA_PUBLIC_REPO
+                    if (Armoury.DeltaDnaApi.instance?.overrideImageMessageEvent ?? false)
+                    {
+                        actionEvent.AddParam("client_event_name", actionEvent.Name);
+
+                        foreach(var pair in Armoury.Analytics.AnalyticsService.GetAllCommonEventProperties())
+                        {
+                            actionEvent.AddParam(pair.Key, pair.Value);
+                        }
+                    }
+                    #endif
+
                     switch ((string) typeObj){
                         case "none":{
                             actions.Add(() => { });

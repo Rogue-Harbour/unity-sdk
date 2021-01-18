@@ -67,10 +67,16 @@ namespace DeltaDNA {
                 yield return Fetch(
                     url,
                     fileTempPath => {
-                        var filePath = cache + GetName(url);
-                        File.Move(fileTempPath, filePath);
-                        var tex = new Texture2D(2, 2){name = "ImageMessageStore"};
-                        onSuccess(tex.LoadImage(File.ReadAllBytes(filePath)) ? tex : null);
+                        try {
+                            var filePath = cache + GetName(url);
+                            File.Move(fileTempPath, filePath);
+                            var tex = new Texture2D(2, 2){name = "ImageMessageStore"};
+                            onSuccess(tex.LoadImage(File.ReadAllBytes(filePath)) ? tex : null);
+                        }
+                        catch(Exception e) {
+                            Logger.LogWarning("Delta dna exception " + e.Message);
+                            onSuccess(null);
+                        }
                     },
                     onError);
             }
@@ -105,7 +111,13 @@ namespace DeltaDNA {
                         t => {
                           
                             var filePath = cache + GetName(url);
-                            File.Move(t,  filePath );
+                            try {
+                                File.Move(t,  filePath );
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.LogWarning("Delta dna exception " + e.Message); 
+                            }
                             downloaded++;
                             downloading--;
                         },

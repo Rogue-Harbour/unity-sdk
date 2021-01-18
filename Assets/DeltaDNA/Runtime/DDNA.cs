@@ -257,8 +257,7 @@ namespace DeltaDNA
         /// <summary>
         /// Changes the session ID for the current User.
         /// </summary>
-        public void NewSession() {
-            string sessionID = GenerateSessionID();
+        public void NewSession(string sessionID) {
             Logger.LogInfo("Starting new session "+sessionID);
             SessionID = sessionID;
 
@@ -273,6 +272,14 @@ namespace DeltaDNA
                 DateTime.UtcNow.ToString(Settings.EVENT_TIMESTAMP_FORMAT));
 
             if (OnNewSession != null) OnNewSession();
+        }
+
+        /// <summary>
+        /// Changes the session ID for the current User.
+        /// </summary>
+        public void NewSession() {
+            string sessionID = GenerateSessionID();
+            NewSession(sessionID);
         }
 
         /// <summary>

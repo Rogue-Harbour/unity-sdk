@@ -40,9 +40,9 @@ namespace DeltaDNA {
     /// </summary>
     public class GameParametersHandler : EventActionHandler {
 
-        private readonly Action<JSONObject> callback;
+        private readonly Action<JSONObject, EventTrigger> callback;
 
-        public GameParametersHandler(Action<JSONObject> callback) {
+        public GameParametersHandler(Action<JSONObject, EventTrigger> callback) {
             this.callback = callback;
         }
 
@@ -53,11 +53,11 @@ namespace DeltaDNA {
 
                 if (persistedParams != null) {
                     store.Remove(trigger);
-                    callback(persistedParams);
+                    callback(persistedParams, trigger);
                 } else if (response.ContainsKey("parameters")) {
-                    callback((JSONObject) response["parameters"]);
+                    callback((JSONObject) response["parameters"], trigger);
                 } else {
-                    callback(new JSONObject());
+                    callback(new JSONObject(), trigger);
                 }
 
                 return true;
@@ -77,9 +77,9 @@ namespace DeltaDNA {
     public class ImageMessageHandler : EventActionHandler {
 
         private readonly DDNA ddna;
-        private readonly Action<ImageMessage> callback;
+        private readonly Action<ImageMessage, EventTrigger> callback;
 
-        public ImageMessageHandler(DDNA ddna, Action<ImageMessage> callback) {
+        public ImageMessageHandler(DDNA ddna, Action<ImageMessage, EventTrigger> callback) {
             this.ddna = ddna;
             this.callback = callback;
         }
@@ -104,7 +104,7 @@ namespace DeltaDNA {
                         store.Remove(trigger);
                     }
 
-                    callback(image);
+                    callback(image, trigger);
                     return true;
                 }
             }

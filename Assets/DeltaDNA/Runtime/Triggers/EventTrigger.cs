@@ -24,7 +24,7 @@ namespace DeltaDNA {
 
     using JSONObject = Dictionary<string, object>;
 
-    internal class EventTrigger : IComparable<EventTrigger>{
+    public class EventTrigger : IComparable<EventTrigger>{
 
         private readonly DDNABase ddna;
         private readonly int index;
@@ -263,24 +263,8 @@ namespace DeltaDNA {
                 }
                 if (limit != -1 && runs >= limit) return false;
                 
-                runs++;
-                var eventTriggeredActionEvent = new GameEvent("ddnaEventTriggeredAction")
-                    .AddParam("ddnaEventTriggeredCampaignID", campaignId)
-                    .AddParam("ddnaEventTriggeredCampaignPriority", priority)
-                    .AddParam("ddnaEventTriggeredVariantID", variantId)
-                    .AddParam("ddnaEventTriggeredActionType", GetAction())
-                    .AddParam("ddnaEventTriggeredSessionCount", runs);
-
-                if (campaignName != null){
-                    eventTriggeredActionEvent.AddParam("ddnaEventTriggeredCampaignName", campaignName);
-                }
-
-                if (variantName != null){
-                    eventTriggeredActionEvent.AddParam("ddnaEventTriggeredVariantName", variantName);
-                }
-
+                var eventTriggeredActionEvent = CreateEventTriggeredActionEvent(true);
                 ddna.RecordEvent(eventTriggeredActionEvent);
-
             }
 
             return result;
@@ -294,6 +278,40 @@ namespace DeltaDNA {
             else{
                 return primary;
             }
+        }
+
+        public GameEvent CreateEventTriggeredActionEvent(bool incrementRuns, 
+            string name = "ddnaEventTriggeredAction",
+            string actionKey = "ddnaEventTriggeredAction",
+            string campaignIdKey = "ddnaEventTriggeredCampaignID",
+            string campaignPriorityKey = "ddnaEventTriggeredCampaignPriority",
+            string variantIdKey = "ddnaEventTriggeredVariantID",
+            string actionTypeKey = "ddnaEventTriggeredActionType",
+            string sessionCountKey = "ddnaEventTriggeredSessionCount",
+            string campaignNameKey = "ddnaEventTriggeredCampaignName",
+            string variantNameKey = "ddnaEventTriggeredVariantName")
+        {
+            if (incrementRuns)
+            {
+                runs++;
+            }
+
+            var eventTriggeredActionEvent = new GameEvent(actionKey)
+                .AddParam(campaignIdKey, campaignId)
+                .AddParam(campaignPriorityKey, priority)
+                .AddParam(variantIdKey, variantId)
+                .AddParam(actionTypeKey, GetAction())
+                .AddParam(sessionCountKey, runs);
+
+            if (campaignName != null){
+                eventTriggeredActionEvent.AddParam(campaignNameKey, campaignName);
+            }
+
+            if (variantName != null){
+                eventTriggeredActionEvent.AddParam(variantNameKey, variantName);
+            }
+
+            return eventTriggeredActionEvent;
         }
 
 #if UNITY_EDITOR

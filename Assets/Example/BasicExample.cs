@@ -23,13 +23,13 @@ namespace DeltaDNA {
 public class BasicExample : MonoBehaviour {
 
     [SerializeField]
-    private Transform cubeObj;
+    private Transform cubeObj = null;
     [SerializeField]
-    private GameObject popUpObj;
+    private GameObject popUpObj = null;
     [SerializeField]
-    private Text popUpContent;
+    private Text popUpContent = null;
     [SerializeField]
-    private Text popUpTitle;
+    private Text popUpTitle = null;
 
     // Use this for initialization
     void Start () {
@@ -67,11 +67,11 @@ public class BasicExample : MonoBehaviour {
         //Register default handlers for event triggered campaigns. These will be candidates for handling ANY Event-Triggered Campaigns. 
         //Any handlers added to RecordEvent() calls with the .Add method will be evaluated before these default handlers. 
         DDNA.Instance.Settings.DefaultImageMessageHandler =
-            new ImageMessageHandler(DDNA.Instance, imageMessage =>{
+            new ImageMessageHandler(DDNA.Instance, (imageMessage, trigger) =>{
                 // the image message is already prepared so it will show instantly
                 imageMessage.Show();
             });
-        DDNA.Instance.Settings.DefaultGameParameterHandler = new GameParametersHandler(gameParameters =>{
+        DDNA.Instance.Settings.DefaultGameParameterHandler = new GameParametersHandler((gameParameters, trigger) =>{
             // do something with the game parameters
             Debug.Log("Received game parameters from event trigger: " + gameParameters);
         });

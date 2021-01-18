@@ -99,28 +99,33 @@ public class IosNotifications : MonoBehaviour
         }
 
     #region Native Bridge
+    public void DidLaunchWithPushNotification(string notification)
+    {
+        Debug.Log("[DeltaDna] Did launch with iOS push notification");
+        Logger.LogDebug("Did launch with iOS push notification");
+
+        var payload = DeltaDNA.MiniJSON.Json.Deserialize(notification) as Dictionary<string, object>;
+        payload["_ddCommunicationSender"] = "APPLE_NOTIFICATION";
+        DDNA.Instance.RecordPushNotification(payload);
+
+        if (OnDidLaunchWithPushNotification != null)
+        {
+            OnDidLaunchWithPushNotification(notification);
+        }
+    }
 
     public void DidReceivePushNotification(string notification)
     {
+        Debug.Log("[DeltaDna] Did receive iOS push notification");
+        Logger.LogDebug("Did receive iOS push notification");
+
         var payload = DeltaDNA.MiniJSON.Json.Deserialize(notification) as Dictionary<string, object>;
         payload["_ddCommunicationSender"] = "APPLE_NOTIFICATION";
+        DDNA.Instance.RecordPushNotification(payload);
 
-        if (Convert.ToBoolean(payload["_ddLaunch"])) {
-            Logger.LogDebug("Did launch with iOS push notification");
-
-            DDNA.Instance.RecordPushNotification(payload);
-
-            if (OnDidLaunchWithPushNotification != null) {
-                OnDidLaunchWithPushNotification(notification);
-            }
-        } else {
-            Logger.LogDebug("Did receive iOS push notification");
-
-            DDNA.Instance.RecordPushNotification(payload);
-
-            if (OnDidReceivePushNotification != null) {
-                OnDidReceivePushNotification(notification);
-            }
+        if (OnDidReceivePushNotification != null)
+        {
+            OnDidReceivePushNotification(notification);
         }
     }
 
@@ -128,7 +133,17 @@ public class IosNotifications : MonoBehaviour
     {
         Logger.LogInfo("Did register for iOS push notifications: "+deviceToken);
 
+        #if !DELTA_DNA_PUBLIC_REPO
+        /// if DeltaDna is set to register iOS push notifications then update the token reference.
+        ///     else leave it alone! It will send a new "notificationServices" event each time the reference is updated,
+        ///     regardless of if it is the exact same token.
+        if (DeltaDnaApi.instance.willRegisterIOSPushNotifications && !string.IsNullOrEmpty(deviceToken) && !string.Equals(deviceToken, DDNA.Instance.PushNotificationToken))
+        {
+            DDNA.Instance.PushNotificationToken = deviceToken;
+        }
+        #else
         DDNA.Instance.PushNotificationToken = deviceToken;
+        #endif
 
         if (OnDidRegisterForPushNotifications != null) {
             OnDidRegisterForPushNotifications(deviceToken);

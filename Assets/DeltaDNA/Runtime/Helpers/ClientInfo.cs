@@ -24,7 +24,7 @@ namespace DeltaDNA
     /// The ClientInfo class determines facts about the device the game is being played on.  The
     /// results are formatted to be valid game parameter values.
     /// </summary>
-    static class ClientInfo
+    public static class ClientInfo
     {
         private static string platform = null;
 

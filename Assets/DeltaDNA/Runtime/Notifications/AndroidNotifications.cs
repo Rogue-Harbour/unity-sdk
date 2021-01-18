@@ -29,6 +29,9 @@ namespace DeltaDNA
     /// </summary>
     public class AndroidNotifications : MonoBehaviour
     {
+        public const string PREFS_CURRENT_PUSH_TOKEN = "NotificationService:currentPushToken";
+        public const string PREFS_IS_PUSH_NOTIFICATIONS_ENABLED = "NotificationService:isPushNotificationsEnabled";
+
         #if UNITY_ANDROID && !UNITY_EDITOR
         private Android.DDNANotifications ddnaNotifications;
         #endif
@@ -137,6 +140,11 @@ namespace DeltaDNA
             var payload = MiniJSON.Json.Deserialize(notification) as Dictionary<string, object>;
             payload["_ddCommunicationSender"] = "GOOGLE_NOTIFICATION";
 
+            if (payload.ContainsKey("notificationName") && (!payload.ContainsKey("_ddName") || string.IsNullOrEmpty(payload["_ddName"].ToString())))
+			{
+				payload["_ddName"] = payload["notificationName"];
+			}
+
             if (payload["_ddLaunch"] as bool? ?? false) {
                 Logger.LogDebug("Did launch with Android push notification");
 
@@ -160,10 +168,18 @@ namespace DeltaDNA
         {
             Logger.LogDebug("Did register for Android push notifications: "+registrationId);
 
-            DDNA.Instance.AndroidRegistrationID = registrationId;
+            if (registrationId != PlayerPrefs.GetString(PREFS_CURRENT_PUSH_TOKEN, ""))
+            {
+                DDNA.Instance.AndroidRegistrationID = registrationId;
 
-            if (OnDidRegisterForPushNotifications != null) {
-                OnDidRegisterForPushNotifications(registrationId);
+                if (OnDidRegisterForPushNotifications != null)
+                {
+                    OnDidRegisterForPushNotifications(registrationId);
+                }
+
+                PlayerPrefs.SetInt(PREFS_IS_PUSH_NOTIFICATIONS_ENABLED, 1);
+                PlayerPrefs.SetString(PREFS_CURRENT_PUSH_TOKEN, registrationId);
+                PlayerPrefs.Save();
             }
         }
 
