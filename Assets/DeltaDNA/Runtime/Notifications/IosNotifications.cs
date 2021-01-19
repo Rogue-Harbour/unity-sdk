@@ -137,7 +137,7 @@ public class IosNotifications : MonoBehaviour
         /// if DeltaDna is set to register iOS push notifications then update the token reference.
         ///     else leave it alone! It will send a new "notificationServices" event each time the reference is updated,
         ///     regardless of if it is the exact same token.
-        if (DeltaDnaApi.instance.willRegisterIOSPushNotifications && !string.IsNullOrEmpty(deviceToken) && !string.Equals(deviceToken, DDNA.Instance.PushNotificationToken))
+        if (Armoury.DeltaDnaApi.instance.willRegisterIOSPushNotifications && !string.IsNullOrEmpty(deviceToken) && !string.Equals(deviceToken, DDNA.Instance.PushNotificationToken))
         {
             DDNA.Instance.PushNotificationToken = deviceToken;
         }
